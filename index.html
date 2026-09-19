@@ -193,15 +193,7 @@
   }
 
   /* ---------- Hero ---------- */
-  .hero { padding: 72px 0 var(--space-12); position: relative; overflow: hidden; }
-  .hero::before {
-    content: "";
-    position: absolute;
-    top: -40%; right: -20%;
-    width: 60%; height: 140%;
-    background: radial-gradient(ellipse at center, rgba(201,74,28,0.12) 0%, rgba(122,34,17,0.04) 45%, transparent 70%);
-    pointer-events: none;
-  }
+  .hero { padding: 72px 0 var(--space-12); position: relative; }
   #ember-canvas {
     position: absolute;
     inset: 0;
@@ -555,7 +547,7 @@
       <h2>About</h2>
     </div>
     <div class="about-text reveal">
-      <p>Backend engineer, ~4 years in — Go and Java, distributed systems, systems that hold up under real load. Shipped discounting infra at Swiggy handling 100K+ orders/month, kept it at 99.99% uptime through 30+ incidents, and built the reminder/payments infra behind Cover Sure's core engagement feature. Looking for my next SDE2 role.</p>
+      <p>Backend engineer, ~4 years in — Go and Java, distributed systems, systems that hold up under real load. Shipped discounting infra handling 100K+ orders/month, kept it at 99.99% uptime through 30+ incidents, and built the reminder/payments infra behind a core engagement feature. Looking for my next SDE2 role.</p>
     </div>
   </section>
 
@@ -636,15 +628,17 @@
           <h4>Problem</h4>
           <ul class="case-list">
             <li>Most portfolio projects are CRUD demos that don't test distributed-systems judgment</li>
-            <li>Wanted something that forced real failure-mode decisions: a worker dying mid-job, a scheduled task firing twice, a dashboard staying honest without polling everything into the ground</li>
+            <li>Reliable job scheduling is deceptively hard: run multiple scheduler instances for high availability, and now two of them can fire the same job at once</li>
+            <li>Needed one scheduling model that handles both one-time and recurring (cron) jobs, not two systems bolted together</li>
           </ul>
         </div>
         <div class="case-block">
           <h4>Approach</h4>
           <ul class="case-list">
             <li>Split the system into scheduler, worker pool, notification service, and API gateway — each independently deployable</li>
-            <li>Redis-based distributed locks so only one worker ever claims a given job</li>
-            <li>Kafka between scheduling and execution, so the two aren't tightly coupled</li>
+            <li>Scheduler runs as multiple replicas for HA, with Redis-based leader election so only one instance is ever the active trigger — same pattern Kubernetes uses, Redis instead of etcd</li>
+            <li>Idempotent trigger keys on top of leader election, so even a leadership handoff mid-trigger can't double-fire a job</li>
+            <li>Workers pull jobs via Kafka consumer groups rather than the scheduler pushing to specific workers — scales workers horizontally without the scheduler becoming a bottleneck</li>
             <li>resilience4j circuit breakers around external calls, so one flaky dependency can't take down the pipeline</li>
             <li>Next.js dashboard with TanStack Query for live job status</li>
           </ul>
