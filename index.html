@@ -54,6 +54,19 @@
 
   .wrap { max-width: var(--max-w); margin: 0 auto; padding: 0 24px; }
 
+  /* ---------- Scroll fuse ---------- */
+  #scroll-fuse {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 3px;
+    width: 0%;
+    background: linear-gradient(90deg, var(--ember-1), var(--ember-2) 55%, var(--ember-3));
+    box-shadow: 0 0 8px rgba(201, 74, 28, 0.65), 0 0 2px rgba(232, 149, 42, 0.8);
+    z-index: 60;
+    transition: width 0.08s linear;
+  }
+
   /* ---------- Ambient background (ash + embers drifting behind content) ---------- */
   #ambient-canvas {
     position: fixed;
@@ -85,8 +98,10 @@
     justify-content: center;
     gap: var(--space-4);
     background: var(--bg);
+    padding: 0 32px;
+    text-align: center;
     animation: splash-out 0.4s ease forwards;
-    animation-delay: 1.35s;
+    animation-delay: 2.35s;
   }
   #splash .splash-mark {
     font-family: var(--font-display);
@@ -110,7 +125,16 @@
     height: 100%;
     width: 0%;
     background: linear-gradient(90deg, var(--ember-2), var(--ember-3));
-    animation: splash-fill 1.2s ease forwards;
+    animation: splash-fill 2.35s ease forwards;
+  }
+  #splash .splash-quote {
+    font-size: 13px;
+    font-style: italic;
+    color: var(--text-dim);
+    max-width: 280px;
+    line-height: 1.5;
+    opacity: 0;
+    animation: rise 0.6s ease-out 0.3s forwards;
   }
   #splash .splash-label {
     font-size: 12px;
@@ -134,6 +158,7 @@
     #splash { animation-delay: 0.25s; animation-duration: 0.25s; }
     #splash .splash-mark { animation: none; background-position: 50% 50%; }
     #splash .splash-bar-fill { animation-duration: 0.25s; }
+    #splash .splash-quote { animation: none; opacity: 1; }
   }
 
   /* ---------- Nav ---------- */
@@ -257,13 +282,14 @@
     font-weight: 600;
     text-decoration: none;
     border-radius: var(--radius);
-    transition: transform 0.15s ease, opacity 0.15s ease;
+    transition: transform 0.15s ease, opacity 0.15s ease, box-shadow 0.25s ease;
   }
   .btn:hover { transform: translateY(-1px); }
   .btn-primary {
     color: #fff;
     background: linear-gradient(100deg, var(--ember-1), var(--ember-2) 60%, var(--ember-3));
   }
+  .btn-primary:hover { box-shadow: 0 6px 20px rgba(201, 74, 28, 0.4); }
   .btn-secondary {
     color: var(--text);
     border: 1px solid var(--panel-line);
@@ -304,7 +330,18 @@
   /* ---------- Section scaffolding ---------- */
   section { padding: var(--space-12) 0; border-top: 1px solid var(--panel-line); scroll-margin-top: 70px; }
   .section-head { display: flex; align-items: baseline; gap: var(--space-3); margin-bottom: var(--space-8); }
-  .section-num { font-family: var(--font-display); font-size: 15px; font-weight: 700; color: var(--ember-3); }
+  .section-num {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--ember-3);
+    text-shadow: 0 0 10px rgba(232, 149, 42, 0.55);
+    animation: num-pulse 3.2s ease-in-out infinite;
+  }
+  @keyframes num-pulse {
+    0%, 100% { text-shadow: 0 0 8px rgba(232, 149, 42, 0.4); }
+    50%      { text-shadow: 0 0 14px rgba(232, 149, 42, 0.75); }
+  }
   h2 {
     font-family: var(--font-display);
     font-weight: 700;
@@ -330,12 +367,40 @@
     display: grid;
     grid-template-columns: 148px 1fr;
     gap: var(--space-6);
-    padding: var(--space-6) 0;
+    padding: var(--space-6) 16px;
+    margin: 0 -16px;
     border-bottom: 1px solid var(--panel-line);
+    border-radius: 3px;
+    transition: box-shadow 0.3s ease, background 0.3s ease;
+  }
+  .job:hover {
+    background: rgba(201, 74, 28, 0.045);
+    box-shadow: inset 0 0 0 1px rgba(201, 74, 28, 0.12), 0 0 24px rgba(122, 34, 17, 0.12);
   }
   .job:last-child { border-bottom: none; padding-bottom: 0; }
   .job:first-child { padding-top: 0; }
-  .job-meta { color: var(--text-mute); font-size: 13px; line-height: 1.5; }
+  .job-meta { color: var(--text-mute); font-size: 13px; line-height: 1.5; position: relative; padding-left: 18px; }
+  .job-meta::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 5px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, var(--ember-3), var(--ember-2) 60%, var(--ember-1));
+    box-shadow: 0 0 8px rgba(201, 74, 28, 0.65);
+  }
+  .job-meta::after {
+    content: "";
+    position: absolute;
+    left: 3px;
+    top: 15px;
+    bottom: -24px;
+    width: 1px;
+    background: var(--panel-line);
+  }
+  .job:last-child .job-meta::after { display: none; }
   .job-meta .dates { display: block; margin-top: 4px; }
   .job-title { font-family: var(--font-display); font-weight: 600; font-size: 19px; margin: 0 0 4px; }
   .job-stack { font-size: 13px; color: var(--ember-3); margin: 0 0 var(--space-3); }
@@ -351,6 +416,11 @@
     background: var(--panel);
     border: 1px solid var(--panel-line);
     position: relative;
+    transition: box-shadow 0.35s ease, border-color 0.35s ease;
+  }
+  .case-study:hover {
+    border-color: #4a382c;
+    box-shadow: 0 0 32px rgba(122, 34, 17, 0.22), 0 0 4px rgba(232, 149, 42, 0.12);
   }
   .case-study::before {
     content: "";
@@ -375,11 +445,24 @@
   .case-status .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--ember-3); }
   .case-title { font-family: var(--font-display); font-weight: 700; font-size: 30px; margin: 0 0 var(--space-2); }
   .case-sub { font-size: 15px; color: var(--text-dim); margin: 0; max-width: 58ch; }
+  .case-links { display: flex; flex-wrap: wrap; gap: var(--space-2) var(--space-6); margin-top: var(--space-4); font-size: 13px; }
+  .case-links a { color: var(--ember-3); text-decoration: none; border-bottom: 1px solid var(--panel-line); transition: color 0.15s ease, border-color 0.15s ease; }
+  .case-links a:hover { color: var(--text); border-color: var(--ember-3); }
+  .case-list code, .case-block code { font-family: 'SFMono-Regular', Consolas, monospace; font-size: 12.5px; color: var(--text); background: var(--bg); border: 1px solid var(--panel-line); padding: 1px 5px; }
 
   .case-body { padding: var(--space-6) var(--space-8) var(--space-8); }
-  .case-block { padding: var(--space-6) 0; border-bottom: 1px solid var(--panel-line); }
-  .case-block:last-of-type { border-bottom: none; padding-bottom: 0; }
+  .case-block { padding: var(--space-6) 0; position: relative; }
+  .case-block:not(:last-of-type)::after {
+    content: "";
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--ember-2) 15%, var(--ember-3) 50%, var(--ember-2) 85%, transparent);
+    opacity: 0.35;
+    box-shadow: 0 0 6px rgba(201, 74, 28, 0.35);
+  }
   .case-block:first-child { padding-top: 0; }
+  .case-block:last-of-type { padding-bottom: 0; }
   .case-block h4 {
     font-family: var(--font-display);
     font-size: 14px;
@@ -454,7 +537,7 @@
     background: var(--panel);
     transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
   }
-  .pill:hover { border-color: var(--ember-3); color: var(--text); transform: translateY(-2px); }
+  .pill:hover { border-color: var(--ember-3); color: var(--text); transform: translateY(-2px); box-shadow: 0 4px 14px rgba(122, 34, 17, 0.25); }
 
   @media (max-width: 560px) { .skills-grid { grid-template-columns: 1fr; } }
 
@@ -470,7 +553,7 @@
   @media (prefers-reduced-motion: reduce) {
     html { scroll-behavior: auto; }
     .hero .eyebrow, .hero h1, .hero .cta-row,
-    .reveal, .pill, .btn, .case-study::before {
+    .reveal, .pill, .btn, .case-study::before, .section-num {
       animation: none !important;
       transition: none !important;
       opacity: 1 !important;
@@ -481,14 +564,44 @@
 </head>
 <body>
 
+<div id="scroll-fuse"></div>
+
 <canvas id="ambient-canvas" aria-hidden="true"></canvas>
 
 <div id="splash" aria-hidden="true">
   <p class="splash-mark">GA</p>
   <div class="splash-bar"><div class="splash-bar-fill"></div></div>
+  <p class="splash-quote" id="splash-quote"></p>
   <p class="splash-label">Loading portfolio…</p>
 </div>
-</div>
+<script>
+  (function () {
+    var quotes = [
+      "Pressure doesn't break good systems. It reveals them.",
+      "Anything worth building survives contact with load.",
+      "Slow fires forge the strongest steel.",
+      "Uptime is a habit, not an accident.",
+      "The best code is the code no one notices at 3am.",
+      "Build it so it fails quietly and recovers loudly.",
+      "Every system has a breaking point. Know yours before it does.",
+      "Reliability is just care, repeated at scale.",
+      "A system that's never failed has never really been tested.",
+      "Scale reveals what shortcuts hide.",
+      "The fire that tempers also strengthens.",
+      "Good architecture bends before it breaks.",
+      "Idempotency is just promising to keep your word twice.",
+      "Latency lies. Tail latency tells the truth.",
+      "On-call teaches humility faster than any code review.",
+      "Ashes settle. Good systems don't.",
+      "Redundancy isn't paranoia, it's respect for entropy.",
+      "Every outage is a lesson wearing a disguise.",
+      "Design for the 2am page, not the demo.",
+      "Heat forges what comfort cannot."
+    ];
+    var el = document.getElementById('splash-quote');
+    if (el) el.textContent = quotes[Math.floor(Math.random() * quotes.length)];
+  })();
+</script>
 
 <canvas id="fx-canvas" aria-hidden="true"></canvas>
 
@@ -617,56 +730,70 @@
       <h2>Projects</h2>
     </div>
 
-    <div class="case-study reveal">
-      <div class="case-head">
-        <p class="case-status"><span class="dot"></span>In active development</p>
-        <p class="case-title">JobHub</p>
-        <p class="case-sub">A distributed job orchestration platform — scheduler, worker pool, notification service, and API gateway — built to be production-grade rather than a demo.</p>
+    <div class="case-study">
+      <div class="case-head reveal">
+        <p class="case-status"><span class="dot"></span>Live · deployed on Render</p>
+        <p class="case-title">Seat Reservation at Scale</p>
+        <p class="case-sub">A JSON HTTP API that sells assigned seats and stays correct when thousands of buyers hit the same show at once — no seat sold twice, per-user limit enforced, retries counted once, zero 5xx.</p>
+        <div class="case-links">
+          <a href="https://github.com/Vick1996/seat-booking-system" target="_blank" rel="noopener">GitHub repo</a>
+          <a href="https://seat-reservation-s7ac.onrender.com/actuator/health/readiness" target="_blank" rel="noopener">Live API</a>
+        </div>
       </div>
       <div class="case-body">
-        <div class="case-block">
+        <div class="case-block reveal">
           <h4>Problem</h4>
           <ul class="case-list">
-            <li>Most portfolio projects are CRUD demos that don't test distributed-systems judgment</li>
-            <li>Reliable job scheduling is deceptively hard: run multiple scheduler instances for high availability, and now two of them can fire the same job at once</li>
-            <li>Needed one scheduling model that handles both one-time and recurring (cron) jobs, not two systems bolted together</li>
+            <li>At on-sale time thousands of buyers compete for the same seats — a read-then-write check lets two buyers both see a seat as free and both win</li>
+            <li>Clients retry on timeouts, so the same request can arrive twice and still has to count once</li>
+            <li>Under overload the system must degrade into clean declines, never 5xx errors or wrong answers</li>
           </ul>
         </div>
-        <div class="case-block">
+        <div class="case-block reveal">
           <h4>Approach</h4>
           <ul class="case-list">
-            <li>Split the system into scheduler, worker pool, notification service, and API gateway — each independently deployable</li>
-            <li>Scheduler runs as multiple replicas for HA, with Redis-based leader election so only one instance is ever the active trigger — same pattern Kubernetes uses, Redis instead of etcd</li>
-            <li>Idempotent trigger keys on top of leader election, so even a leadership handoff mid-trigger can't double-fire a job</li>
-            <li>Workers pull jobs via Kafka consumer groups rather than the scheduler pushing to specific workers — scales workers horizontally without the scheduler becoming a bottleneck</li>
-            <li>resilience4j circuit breakers around external calls, so one flaky dependency can't take down the pipeline</li>
-            <li>Next.js dashboard with TanStack Query for live job status</li>
+            <li>Atomic sale: one guarded conditional UPDATE (<code>status='available'</code> in the WHERE clause) under a Postgres row lock, rolled back unless every requested seat was taken — no read-then-write window</li>
+            <li>Multi-seat requests are all-or-nothing, with seats locked in a global label order so overlapping requests can't deadlock</li>
+            <li>Per-user limit made race-free with a transaction-scoped advisory lock on (show, user)</li>
+            <li>Exactly-once retries: idempotency key stored under a unique constraint plus an advisory lock; a replay returns the original reservation, a reused key with different seats is a 409</li>
+            <li>Opt-in time-boxed holds whose expiry is enforced in SQL against the database clock, so correctness never depends on a background sweeper</li>
+            <li>Consistency over availability by design: one Postgres primary, readiness fails closed within 2s, and saturation is shed as 429 instead of guessing</li>
           </ul>
         </div>
-        <div class="case-block">
+        <div class="case-block reveal">
           <h4>Tools</h4>
           <div class="tool-groups">
             <div class="tool-group">
               <h5>Backend</h5>
-              <p>Spring Boot 4.1.1 · Java · Kafka · Redis · PostgreSQL · resilience4j · Testcontainers</p>
+              <p>Java 21 · Spring Boot 3.5 · PostgreSQL 16 · Flyway · Spring Security (JWT)</p>
             </div>
             <div class="tool-group">
-              <h5>Frontend</h5>
-              <p>Next.js · TypeScript · TanStack Query · Zustand · Tailwind · shadcn/ui · Zod</p>
-            </div>
-            <div class="tool-group">
-              <h5>Testing</h5>
-              <p>Vitest · React Testing Library · Playwright · MSW</p>
+              <h5>Testing &amp; load</h5>
+              <p>Concurrency and ops integration tests · 20,000-request burst harness</p>
             </div>
             <div class="tool-group">
               <h5>Observability</h5>
-              <p>Sentry</p>
+              <p>Prometheus metrics · health and readiness probes · structured JSON logs with request IDs</p>
+            </div>
+            <div class="tool-group">
+              <h5>Delivery</h5>
+              <p>Docker · Docker Compose · Render</p>
             </div>
           </div>
         </div>
-        <div class="case-block">
-          <h4>Status</h4>
-          <p>Core scheduling and distributed-locking logic are functional. Frontend dashboard, end-to-end test coverage, and the observability layer are in progress.</p>
+        <div class="case-block reveal">
+          <h4>Verification</h4>
+          <ul class="case-list">
+            <li>A one-command burst fires 20,000 requests — hot-seat storms, multi-seat pairs, and 10% same-key retries across 2,000 users — against a 500-seat show</li>
+            <li>The run fails on any double-sold seat, any 5xx, or <code>available + held + confirmed ≠ total seats</code>, sampled every 500ms during the burst</li>
+          </ul>
+        </div>
+        <div class="case-block reveal">
+          <h4>Lessons learned</h4>
+          <ul class="case-list">
+            <li>Measure before blaming: failures I first pinned on Docker's port proxy turned out to be the app's own connection limits</li>
+            <li>Failure paths need tests too: the readiness check hung during a database outage until a test exposed it, and now fails closed in 2s</li>
+          </ul>
         </div>
       </div>
     </div>
@@ -1174,6 +1301,22 @@
       requestAnimationFrame(tick);
     }
     requestAnimationFrame(tick);
+  })();
+</script>
+
+<script>
+  (function () {
+    var fuse = document.getElementById('scroll-fuse');
+    if (!fuse) return;
+    function updateFuse() {
+      var scrollTop = window.scrollY || document.documentElement.scrollTop;
+      var docHeight = document.documentElement.scrollHeight - window.innerHeight;
+      var pct = docHeight > 0 ? Math.min((scrollTop / docHeight) * 100, 100) : 0;
+      fuse.style.width = pct + '%';
+    }
+    window.addEventListener('scroll', updateFuse, { passive: true });
+    window.addEventListener('resize', updateFuse);
+    updateFuse();
   })();
 </script>
 
